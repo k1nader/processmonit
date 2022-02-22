@@ -1,7 +1,7 @@
 # processmonit
 windows process monit
 
-      params: ');
+      params: 
        -file: process file name.
        -param: process param.
        -timeout: restart process timeout.
