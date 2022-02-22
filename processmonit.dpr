@@ -19,9 +19,17 @@ type
 
 function IsWindowAborted(Wnd: DWORD): Boolean;
 var
-  p, ErrorCode: DWORD;
+  ErrorCode: DWORD;
+{$IFDEF CPUX86}
+  P: DWORD;
+{$ELSE}
+  P: PDWORD_PTR;
+{$ENDIF}
 begin
-  ErrorCode := SendMessageTimeout(Wnd, 0, 0, 0, SMTO_ERRORONEXIT, 3000, p);
+{$IFDEF CPUX64}
+  P := nil;
+{$ENDIF}
+  ErrorCode := SendMessageTimeout(Wnd, 0, 0, 0, SMTO_ERRORONEXIT, 3000, P);
   Result := ErrorCode = 0;
 end;
 
@@ -138,16 +146,16 @@ end;
 function IsProcessIdRunning(const APID: DWORD): Boolean;
 var
   h: THandle;
-  p: TProcessEntry32;
+  P: TProcessEntry32;
 begin
 
-  p.dwSize := SizeOf(p);
+  P.dwSize := SizeOf(P);
   h := CreateToolHelp32Snapshot(TH32CS_SnapProcess, 0);
   try
-    Process32First(h, p);
+    Process32First(h, P);
     repeat
-      Result := APID = p.th32ProcessID;
-    until Result or (not Process32Next(h, p));
+      Result := APID = P.th32ProcessID;
+    until Result or (not Process32Next(h, P));
   finally
     CloseHandle(h);
   end;
